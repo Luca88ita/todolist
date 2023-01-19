@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ToDoListController">
+   <center>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <ListView fx:id="lvTBD" layoutX="54.0" layoutY="125.0" prefHeight="200.0" prefWidth="200.0" />
+            <ListView fx:id="lvDone" layoutX="341.0" layoutY="125.0" prefHeight="200.0" prefWidth="200.0" />
+            <Button fx:id="btDone" layoutX="283.0" layoutY="154.0" mnemonicParsing="false" onAction="#onClickDoneBt" text="--&gt;" />
+            <Button fx:id="btUndone" layoutX="283.0" layoutY="213.0" mnemonicParsing="false" onAction="#onClickUndoneBt" text="&lt;--" />
+            <TextField fx:id="tfNewTask" layoutX="54.0" layoutY="50.0" prefHeight="25.0" prefWidth="407.0" />
+            <Label layoutX="54.0" layoutY="22.0" text="Aggiungi una nuova task alla lista" />
+            <Button fx:id="btAdd" layoutX="478.0" layoutY="50.0" mnemonicParsing="false" onAction="#onClickAddBt" text="Aggiungi" />
+            <Label layoutX="54.0" layoutY="94.0" text="Cose da fare" />
+            <Label layoutX="341.0" layoutY="94.0" text="Cose già fatte" />
+            <Button fx:id="BtEmptyDoneList" layoutX="359.0" layoutY="336.0" mnemonicParsing="false" onAction="#onClickEmptyDoneListBt" text="Svuota lista task completate" />
+         </children>
+      </AnchorPane>
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Apri..." />
+                  <MenuItem mnemonicParsing="false" onAction="#onClickMenuSave" text="Salva" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#onClickMenuClose" text="Chiudi" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Aiuto">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>
