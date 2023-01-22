@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ToDoListController">
    <center>
       <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -36,13 +35,14 @@
             <items>
               <MenuItem mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Apri..." />
                   <MenuItem mnemonicParsing="false" onAction="#onClickMenuSave" text="Salva" />
+                  <MenuItem mnemonicParsing="false" onAction="#onClickMenuSaveWithName" text="Salva con nome..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#onClickMenuClose" text="Chiudi" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Aiuto">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#OnClickMenuInfo" text="Info..." />
             </items>
           </Menu>
         </menus>

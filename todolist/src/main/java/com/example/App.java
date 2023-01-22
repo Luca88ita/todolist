@@ -18,6 +18,8 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("todolist-view"), 640, 480);
+        stage.setTitle("To do list - "+ToDoListController.fileName);
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
