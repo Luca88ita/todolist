@@ -26,7 +26,7 @@ public class ToDoListController {
 
   File selectedFile = null;
   static String fileName = "Nuovo documento";
-  File defaultPath = null; // devo trovare il modo di settarlo come ultimo path visitato
+  File defaultPath = ""; // devo trovare il modo di settarlo come ultimo path visitato
 
   @FXML
   private ResourceBundle resources;
@@ -74,6 +74,10 @@ public class ToDoListController {
     }    
   }
 
+  private void saveConfig (){
+
+  }
+
   private void saveDocument (boolean changePath){
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text doc(*.txt)","*.txt"));
@@ -96,16 +100,35 @@ public class ToDoListController {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Apri il file...");
     File selectedFileChange = null;
-    /*if (selectedFile != null){      
-      fileChooser.setInitialDirectory(selectedFile.getAbsoluteFile());   // devo ancora trovare il modo di fargli prendere il path dell'ultimo file aperto
-    }*/
+    //Filtro per le estensioni selezionabili
+    FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("files TXT (*.txt)", "*.txt");
+    fileChooser.getExtensionFilters().add(extensionFilter);
+    //Imposta un indirizzo di default, o vai alla user directory se l'indirizzo non è valido
+    String userDirectoryString = System.getProperty("user.home");
+    File userDirectory = new File(defaultPath);
+    if(!userDirectory.canRead()) {
+      userDirectory = new File(userDirectoryString);
+    }
+    //Seleziona il file da leggere
+    fileChooser.setInitialDirectory(userDirectory);
+    //Verifica che sia selezionato un file
     selectedFileChange = fileChooser.showOpenDialog(null);
     if (selectedFileChange != null) {
         try {
+          //Salva l'ultmo path visitato come path predfinito
+          defaultPath = selectedFileChange.getPath();
+          defaultPath = defaultPath.replaceAll("\\\\", "/");
+          int toLastSlash = defaultPath.lastIndexOf("/")+1;
+          defaultPath = defaultPath.substring(0,toLastSlash);
+          //Memorizza l'ultimo file aperto nella variabile globale selectedFile
           selectedFile = selectedFileChange;
+          //Legge il file riga per riga
           List<String> lines = Files.readAllLines(selectedFile.toPath());
+          //estrapola il nome del documento aperto e lo salva nella variabile globale fileName
           fileName = selectedFile.getName();
+          //Aggiorna il titolo della scena aggiungendo il nome del documento aperto
           changeTitle();
+          //Svuota i 2 list view e aggiorna lvTBD con gli elementi letti dal file
           lvTBD.getItems().clear();
           lvDone.getItems().clear();
           lvTBD.getItems().addAll(lines);
