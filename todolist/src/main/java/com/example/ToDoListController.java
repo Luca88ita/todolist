@@ -24,9 +24,9 @@ import javafx.stage.StageStyle;
 
 public class ToDoListController {
 
-  File selectedFile = null;
+  private File selectedFile = null;
   static String fileName = "Nuovo documento";
-  String defaultPath = ""; // devo trovare il modo di settarlo come ultimo path visitato
+  private String defaultPath = ""; // devo trovare il modo di settarlo come ultimo path visitato
 
   @FXML
   private ResourceBundle resources;
@@ -74,18 +74,40 @@ public class ToDoListController {
     }    
   }
 
-  private void saveConfig (){
+  private String saveLastAbsolutePath (File file){
+    defaultPath = file.getAbsolutePath();
+    defaultPath = defaultPath.replaceAll("\\\\", "/");
+    int toLastSlash = defaultPath.lastIndexOf("/")+1;
+    defaultPath = defaultPath.substring(0,toLastSlash);
+    return defaultPath;
+  }
 
+  private File setDefaultPath (String path){
+    String userDirectoryString = System.getProperty("user.home");
+    File userDirectory = new File(path);
+    if(!userDirectory.canRead()) {
+      userDirectory = new File(userDirectoryString);
+    }
+    return userDirectory;
   }
 
   private void saveDocument (boolean changePath){
     FileChooser fileChooser = new FileChooser();
+    //Filtro per le estensioni selezionabili
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text doc(*.txt)","*.txt"));
+    //Titolo per la finestra di dialogo
     fileChooser.setTitle("Salva con nome...");
+    //verifica se voglio salvare su un file preesistente o se voglio salvare su un nuovo file
     if (selectedFile != null && changePath == false) {
       writeDocument();
     }else{
+      //Richiama l'ultimo percorso selezionato per un salvataggio o un'apertura
+      File userDirectory = setDefaultPath(defaultPath);
+      fileChooser.setInitialDirectory(userDirectory);
+      //Mstra la finestra di dialogo per il salvataggio
       selectedFile = fileChooser.showSaveDialog(null).getAbsoluteFile();
+      //Imposta un nuovo percorso di default in base all'ultimo percorso utilizzato
+      defaultPath = saveLastAbsolutePath(selectedFile);
       if(!selectedFile.getName().contains(".")) {
         selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
       }
@@ -93,6 +115,10 @@ public class ToDoListController {
       fileName = selectedFile.getName();
       changeTitle();
     }
+  }
+
+  private void saveConfig (){
+
   }
 
   @FXML
@@ -104,11 +130,7 @@ public class ToDoListController {
     FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("files TXT (*.txt)", "*.txt");
     fileChooser.getExtensionFilters().add(extensionFilter);
     //Imposta un indirizzo di default, o vai alla user directory se l'indirizzo non è valido
-    String userDirectoryString = System.getProperty("user.home");
-    File userDirectory = new File(defaultPath);
-    if(!userDirectory.canRead()) {
-      userDirectory = new File(userDirectoryString);
-    }
+    File userDirectory = setDefaultPath(defaultPath);
     //Seleziona il file da leggere
     fileChooser.setInitialDirectory(userDirectory);
     //Verifica che sia selezionato un file
@@ -116,10 +138,7 @@ public class ToDoListController {
     if (selectedFileChange != null) {
         try {
           //Salva l'ultmo path visitato come path predfinito
-          defaultPath = selectedFileChange.getPath();
-          defaultPath = defaultPath.replaceAll("\\\\", "/");
-          int toLastSlash = defaultPath.lastIndexOf("/")+1;
-          defaultPath = defaultPath.substring(0,toLastSlash);
+          saveLastAbsolutePath(selectedFileChange);
           //Memorizza l'ultimo file aperto nella variabile globale selectedFile
           selectedFile = selectedFileChange;
           //Legge il file riga per riga

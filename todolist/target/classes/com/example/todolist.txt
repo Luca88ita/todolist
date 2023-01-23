@@ -1,3 +1,3 @@
 Aggiungere un Apri con i files recenti nel menu
 Capire come risolvere l errore della non apertura del file txt
-in un file config mettere come defaultPath l'ultimo path visitato
+Aggiungere ultimo path visitato in memoria per riaprirlo quando apro il programma

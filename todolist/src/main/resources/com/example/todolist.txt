@@ -1,3 +1,3 @@
-Aggiungere il path predefinito salvandolo in un file config
 Aggiungere un Apri con i files recenti nel menu
 Capire come risolvere l errore della non apertura del file txt
+Aggiungere ultimo path visitato in memoria per riaprirlo quando apro il programma
