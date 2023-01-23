@@ -26,7 +26,7 @@ public class ToDoListController {
 
   File selectedFile = null;
   static String fileName = "Nuovo documento";
-  File defaultPath = ""; // devo trovare il modo di settarlo come ultimo path visitato
+  String defaultPath = ""; // devo trovare il modo di settarlo come ultimo path visitato
 
   @FXML
   private ResourceBundle resources;
