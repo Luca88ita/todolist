@@ -26,7 +26,7 @@ public class ToDoListController {
 
   private File selectedFile = null;
   static String fileName = "Nuovo documento";
-  private String defaultPath = ""; // devo trovare il modo di settarlo come ultimo path visitato
+  private String defaultPath = "";
 
   @FXML
   private ResourceBundle resources;
@@ -60,11 +60,19 @@ public class ToDoListController {
     stage.setTitle("To do list - "+fileName);
   }
 
-  private void writeDocument (){
-    List<String> lines = lvTBD.getItems();
-    String path = selectedFile.getPath();
+  private void writeListViewOnTxt (ListView<String> listView, File file){
+    //Prelevo gli elementi all'interno della ListView
+    List<String> lines = listView.getItems();
+    //Prelevo il path del file che andrò a scrivere
+    String path = file.getPath();
+    writeDocument(lines, path);
+  }
+
+  private void writeDocument (List<String> lines, String path){
+    //Provo a scrivere il file che si trova nel path fornito e a metterle nella memoria tampone
     try (FileWriter outFile = new FileWriter(path);
     BufferedWriter bWriter = new BufferedWriter(outFile)) {
+      // scrivo linea per linea la lista all'interno del file
       for (String line:lines){
         bWriter.write(line);
         bWriter.newLine();
@@ -97,23 +105,26 @@ public class ToDoListController {
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text doc(*.txt)","*.txt"));
     //Titolo per la finestra di dialogo
     fileChooser.setTitle("Salva con nome...");
-    //verifica se voglio salvare su un file preesistente o se voglio salvare su un nuovo file
-    if (selectedFile != null && changePath == false) {
-      writeDocument();
-    }else{
-      //Richiama l'ultimo percorso selezionato per un salvataggio o un'apertura
-      File userDirectory = setDefaultPath(defaultPath);
-      fileChooser.setInitialDirectory(userDirectory);
-      //Mstra la finestra di dialogo per il salvataggio
-      selectedFile = fileChooser.showSaveDialog(null).getAbsoluteFile();
-      //Imposta un nuovo percorso di default in base all'ultimo percorso utilizzato
-      defaultPath = saveLastAbsolutePath(selectedFile);
-      if(!selectedFile.getName().contains(".")) {
-        selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
+    try{
+      //verifica se voglio salvare su un file preesistente o se voglio salvare su un nuovo file
+      if (selectedFile != null && changePath == false) {
+        writeListViewOnTxt(lvTBD,selectedFile);
+      }else{
+        //Richiama l'ultimo percorso selezionato per un salvataggio o un'apertura
+        File userDirectory = setDefaultPath(defaultPath);
+        fileChooser.setInitialDirectory(userDirectory);
+        //Mostra la finestra di dialogo per il salvataggio
+        selectedFile = fileChooser.showSaveDialog(null).getAbsoluteFile();
+        //Imposta un nuovo percorso di default in base all'ultimo percorso utilizzato
+        defaultPath = saveLastAbsolutePath(selectedFile);
+        if(!selectedFile.getName().contains(".")) {
+          selectedFile = new File(selectedFile.getAbsolutePath() + ".txt");
+        }
+        writeListViewOnTxt(lvTBD,selectedFile);
+        fileName = selectedFile.getName();
+        changeTitle();
       }
-      writeDocument();
-      fileName = selectedFile.getName();
-      changeTitle();
+    }catch (RuntimeException e){
     }
   }
 
@@ -137,7 +148,7 @@ public class ToDoListController {
     selectedFileChange = fileChooser.showOpenDialog(null);
     if (selectedFileChange != null) {
         try {
-          //Salva l'ultmo path visitato come path predfinito
+          //Salva l'ultimo path visitato come path predefinito
           saveLastAbsolutePath(selectedFileChange);
           //Memorizza l'ultimo file aperto nella variabile globale selectedFile
           selectedFile = selectedFileChange;
@@ -147,7 +158,7 @@ public class ToDoListController {
           fileName = selectedFile.getName();
           //Aggiorna il titolo della scena aggiungendo il nome del documento aperto
           changeTitle();
-          //Svuota i 2 list view e aggiorna lvTBD con gli elementi letti dal file
+          //Svuota i due list view e aggiorna lvTBD con gli elementi letti dal file
           lvTBD.getItems().clear();
           lvDone.getItems().clear();
           lvTBD.getItems().addAll(lines);
