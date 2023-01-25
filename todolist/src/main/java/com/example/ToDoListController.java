@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -184,7 +183,6 @@ public class ToDoListController {
     configLines.add("# files aperti.");
     LinkedHashSet <String> tempLHS = new LinkedHashSet<>(lastOpenedFiles);
     List<String> tempList = new ArrayList<String>(tempLHS);
-    //Collections.reverse(tempList);
     if (tempList.size() > 5){
       tempList = tempList.subList(0, 5);
     }
