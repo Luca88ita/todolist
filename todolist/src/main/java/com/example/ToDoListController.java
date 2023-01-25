@@ -6,6 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -16,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -26,7 +32,13 @@ public class ToDoListController {
 
   private File selectedFile = null;
   static String fileName = "Nuovo documento";
-  private String defaultPath = "";
+  private static String defaultPath = "";
+  private static String configPath = "./src/assets/config.config";
+  private static List<String> lastOpenedFiles = new ArrayList<String>();
+
+  public static String getConfigPath() {
+    return configPath;
+  }
 
   @FXML
   private ResourceBundle resources;
@@ -48,6 +60,24 @@ public class ToDoListController {
   
   @FXML
   private ListView<String> lvDone;
+  
+  @FXML
+  private MenuItem noRecentFiles;
+
+  @FXML
+  private MenuItem recent01;
+
+  @FXML
+  private MenuItem recent02;
+
+  @FXML
+  private MenuItem recent03;
+
+  @FXML
+  private MenuItem recent04;
+
+  @FXML
+  private MenuItem recent05;
 
   @FXML
   private ListView<String> lvTBD;
@@ -55,10 +85,15 @@ public class ToDoListController {
   @FXML
   private TextField tfNewTask;
 
-  private void changeTitle() {
+  private void changeTitle(String fileName) {
     Stage stage = (Stage) tfNewTask.getScene().getWindow();
     stage.setTitle("To do list - "+fileName);
   }
+  
+  public static String getSceneTitle() {
+    return fileName;
+  }
+
 
   private void writeListViewOnTxt (ListView<String> listView, File file){
     //Prelevo gli elementi all'interno della ListView
@@ -85,6 +120,9 @@ public class ToDoListController {
   private String saveLastAbsolutePath (File file){
     defaultPath = file.getAbsolutePath();
     defaultPath = defaultPath.replaceAll("\\\\", "/");
+    //Aggiunge il path completo dell'ultimo file visitato all'HashSet
+    lastOpenedFiles.add(0, defaultPath);
+    //Toglie la parte relativa al nome ed estensione del file dal path e lo salva
     int toLastSlash = defaultPath.lastIndexOf("/")+1;
     defaultPath = defaultPath.substring(0,toLastSlash);
     return defaultPath;
@@ -102,7 +140,7 @@ public class ToDoListController {
   private void saveDocument (boolean changePath){
     FileChooser fileChooser = new FileChooser();
     //Filtro per le estensioni selezionabili
-    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text doc(*.txt)","*.txt"));
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File txt(*.txt)","*.txt"));
     //Titolo per la finestra di dialogo
     fileChooser.setTitle("Salva con nome...");
     try{
@@ -122,14 +160,66 @@ public class ToDoListController {
         }
         writeListViewOnTxt(lvTBD,selectedFile);
         fileName = selectedFile.getName();
-        changeTitle();
+        changeTitle(fileName);
+        saveConfig(configPath, defaultPath);
       }
     }catch (RuntimeException e){
     }
   }
 
-  private void saveConfig (){
-
+  private void saveConfig (String confPath, String filePath){
+    List<String> configLines = new ArrayList<>();
+    configLines.add("# File di configurazione della todolist");
+    configLines.add("# Le righe che iniziano con # verranno lette come commenti");
+    configLines.add("# ");
+    configLines.add("# *-*-*-*-*-*-*-*-*-*-*-*-*-*--");
+    configLines.add("# ");
+    configLines.add("# La prima riga e' dedicata all'ultimo path visitato e verra'");
+    configLines.add("# utilizzata per riaprirlo come default all'avvio.");
+    configLines.add("# *-*-*-*-*-*-*-*-*-*-*-*-*-*--");
+    configLines.add(filePath);
+    configLines.add("# ");
+    configLines.add("# *-*-*-*-*-*-*-*-*-*-*-*-*-*--");
+    configLines.add("# Le 5 righe sottostanti servono per trovare gli ultimi 5 ");
+    configLines.add("# files aperti.");
+    LinkedHashSet <String> tempLHS = new LinkedHashSet<>(lastOpenedFiles);
+    List<String> tempList = new ArrayList<String>(tempLHS);
+    //Collections.reverse(tempList);
+    if (tempList.size() > 5){
+      tempList = tempList.subList(0, 5);
+    }
+    configLines.addAll(tempList);
+    lastOpenedFiles.clear();
+    lastOpenedFiles.addAll(tempList);
+    try{
+      writeDocument(configLines, confPath);
+    }catch(RuntimeException e){
+    }
+  }
+  
+  public static void loadConfig (String confPath){
+    int counter = 0;
+    Path path = Paths.get(confPath);
+        try {
+      List<String> configLines = Files.readAllLines(path);
+      for (String line : configLines) {
+        if(line.charAt(0) != '#'){
+          if (counter == 0) {
+            defaultPath = line;
+          }
+          if (counter > 0 && counter <= 6){
+            lastOpenedFiles.add(0,line);
+            //set visible the correspondent MenuItem
+            //change its text with the correspondent file name
+            //link the menuitem to the fileopen to the specified directory
+          }
+          counter++;
+        }
+      }
+    } catch (IOException e) {
+      Alert a = new Alert(Alert.AlertType.ERROR, "Impossibile leggere il file config");
+      a.showAndWait();
+    }
   }
 
   @FXML
@@ -138,7 +228,7 @@ public class ToDoListController {
     fileChooser.setTitle("Apri il file...");
     File selectedFileChange = null;
     //Filtro per le estensioni selezionabili
-    FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("files TXT (*.txt)", "*.txt");
+    FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("File txt (*.txt)", "*.txt");
     fileChooser.getExtensionFilters().add(extensionFilter);
     //Imposta un indirizzo di default, o vai alla user directory se l'indirizzo non è valido
     File userDirectory = setDefaultPath(defaultPath);
@@ -157,11 +247,13 @@ public class ToDoListController {
           //estrapola il nome del documento aperto e lo salva nella variabile globale fileName
           fileName = selectedFile.getName();
           //Aggiorna il titolo della scena aggiungendo il nome del documento aperto
-          changeTitle();
+          changeTitle(fileName);
           //Svuota i due list view e aggiorna lvTBD con gli elementi letti dal file
           lvTBD.getItems().clear();
           lvDone.getItems().clear();
           lvTBD.getItems().addAll(lines);
+          //Aggiorna il file di configurazione
+          saveConfig(configPath, defaultPath);
         }catch (IOException e) {
           Alert a = new Alert(Alert.AlertType.ERROR, "Read error");
           a.showAndWait();
@@ -214,6 +306,7 @@ public class ToDoListController {
 
   @FXML
   void OnClickMenuInfo(ActionEvent event) throws IOException {
+    System.out.println(lastOpenedFiles);
     Parent root = FXMLLoader.load(getClass().getResource("todolist-info.fxml"));
     Scene scene = new Scene(root);
     Stage primaryStage = new Stage();

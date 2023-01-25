@@ -1,0 +1,2 @@
+Aggiungere un Apri con i files recenti nel menu
+Aggiungere il pulsante Nuovo

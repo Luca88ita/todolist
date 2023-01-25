@@ -34,6 +34,16 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Apri..." />
+                  <Menu mnemonicParsing="false" text="Apri recenti">
+                    <items>
+                        <MenuItem fx:id="noRecentFiles" disable="true" mnemonicParsing="false" text="Nessun file recente" />
+                        <MenuItem fx:id="recent01" mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Recente01" visible="false" />
+                        <MenuItem fx:id="recent02" mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Recente02" visible="false" />
+                        <MenuItem fx:id="recent03" mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Recente03" visible="false" />
+                        <MenuItem fx:id="recent04" mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Recente04" visible="false" />
+                        <MenuItem fx:id="recent05" mnemonicParsing="false" onAction="#OnClickMenuOpen" text="Recente05" visible="false" />
+                    </items>
+                  </Menu>
                   <MenuItem mnemonicParsing="false" onAction="#onClickMenuSave" text="Salva" />
                   <MenuItem mnemonicParsing="false" onAction="#onClickMenuSaveWithName" text="Salva con nome..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
